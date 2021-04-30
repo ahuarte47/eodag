@@ -18,18 +18,27 @@
 
 import logging.config
 
+disable_tqdm = False
 
-def setup_logging(verbose):
+
+def setup_logging(verbose, no_progress_bar=False):
     """Define logging level
 
     :param verbose: Accepted values:
 
-                    * 0: no logging
-                    * 1 or 2: INFO level
+                    * 0: no logging with mutted progress bars
+                    * 1: no logging but still displays progress bars
+                    * 2: INFO level
                     * 3: DEBUG level
     :type verbose: int
+
+    :param verbose: (optional) disable progress bars (default=False)
+    :type verbose: bool
     """
-    if verbose == 0:
+    global disable_tqdm
+    disable_tqdm = no_progress_bar
+
+    if verbose <= 1:
         logging.config.dictConfig(
             {
                 "version": 1,
@@ -42,7 +51,7 @@ def setup_logging(verbose):
                 },
             }
         )
-    elif verbose <= 2:
+    elif verbose == 2:
         logging.config.dictConfig(
             {
                 "version": 1,

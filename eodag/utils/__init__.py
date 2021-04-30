@@ -60,6 +60,7 @@ from shapely.geometry import Polygon, shape
 from shapely.geometry.base import BaseGeometry
 from tqdm.auto import tqdm
 
+import eodag.utils.logging
 from eodag.utils.notebook import check_ipython
 
 DEFAULT_PROJ = "EPSG:4326"
@@ -386,7 +387,11 @@ def get_timestamp(date_time):
 
 
 class ProgressCallback(object):
-    """A callable used to render progress to users for long running processes"""
+    """A callable used to render progress to users for long running processes.
+
+    It can be globally disabled using eodag.utils.logging(0) or
+    eodag.utils.logging(level, no_progress_bar=True)
+    """
 
     def __init__(self, max_size=None):
         self.pb = None
@@ -395,6 +400,7 @@ class ProgressCallback(object):
         self.unit_scale = True
         self.desc = ""
         self.position = 0
+        self.disable = False
 
     def __call__(self, current_size, max_size=None):
         """Update the progress bar.
@@ -407,6 +413,7 @@ class ProgressCallback(object):
         if max_size is not None:
             self.max_size = max_size
         if self.pb is None:
+            self.disable = eodag.utils.logging.disable_tqdm
             self.pb = tqdm(
                 total=self.max_size,
                 unit=self.unit,
